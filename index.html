@@ -5,23 +5,63 @@
 <style>
   html,body{margin:0;height:100%;background:#111;color:#eee;
     font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
-  header{position:fixed;top:0;left:0;right:0;padding:14px 18px;z-index:5;
-    background:linear-gradient(#111 55%,transparent);letter-spacing:.04em}
+  header{position:fixed;top:0;left:0;right:0;padding:12px 18px;z-index:5;
+    background:linear-gradient(#111 55%,transparent);letter-spacing:.04em;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   header b{font-weight:600}
-  header span{color:#888;margin-left:10px;font-size:12px}
-  model-viewer{width:100%;height:100%;background:#111;--poster-color:#111}
+  nav{display:flex;gap:8px}
+  nav button{background:#1d1d1f;color:#ddd;border:1px solid #333;border-radius:8px;
+    padding:6px 14px;font:13px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    cursor:pointer;transition:background .15s}
+  nav button:hover{background:#2a2a2c}
+  nav button.active{background:#eee;color:#111;border-color:#eee}
+  main{position:absolute;inset:0;display:flex}
+  model-viewer{flex:1;height:100%;background:#111;--poster-color:#111;min-width:0}
+  main.multi model-viewer + model-viewer{border-left:1px solid #222}
 </style>
-<header><b>67 — Caped Original</b><span>original asset, cape added</span></header>
-<model-viewer
-  src="model.glb"
-  alt="67 character with cape"
-  camera-controls
-  touch-action="pan-y"
-  shadow-intensity="0.9"
-  exposure="1.05"
-  environment-image="neutral"
-  camera-orbit="0deg 82deg 4.2m"
-  min-camera-orbit="auto 0deg auto"
-  max-camera-orbit="auto 180deg auto"
-  field-of-view="28deg">
-</model-viewer>
+<header>
+  <b>67 — Caped Original</b>
+  <nav id="nav">
+    <button data-m="1">1</button>
+    <button data-m="2">2</button>
+    <button data-m="3">3</button>
+    <button data-m="all" class="active">Yan Yana</button>
+  </nav>
+</header>
+<main id="stage" class="multi"></main>
+<script>
+  var SETLER = {
+    "1":   ["karakter1.glb"],
+    "2":   ["karakter2.glb"],
+    "3":   ["karakter3.glb"],
+    "all": ["karakter1.glb","karakter2.glb","karakter3.glb"]
+  };
+  var stage = document.getElementById("stage");
+  var nav = document.getElementById("nav");
+  function goster(mod){
+    stage.innerHTML = "";
+    stage.className = (mod === "all") ? "multi" : "";
+    SETLER[mod].forEach(function(src){
+      var mv = document.createElement("model-viewer");
+      mv.setAttribute("src", src);
+      mv.setAttribute("alt", "67 character");
+      mv.setAttribute("camera-controls", "");
+      mv.setAttribute("touch-action", "pan-y");
+      mv.setAttribute("shadow-intensity", "0.9");
+      mv.setAttribute("exposure", "1.05");
+      mv.setAttribute("environment-image", "neutral");
+      mv.setAttribute("camera-orbit", "0deg 82deg 4.2m");
+      mv.setAttribute("min-camera-orbit", "auto 0deg auto");
+      mv.setAttribute("max-camera-orbit", "auto 180deg auto");
+      mv.setAttribute("field-of-view", "28deg");
+      stage.appendChild(mv);
+    });
+    Array.prototype.forEach.call(nav.querySelectorAll("button"), function(b){
+      b.classList.toggle("active", b.dataset.m === mod);
+    });
+  }
+  nav.addEventListener("click", function(e){
+    if (e.target.dataset && e.target.dataset.m) goster(e.target.dataset.m);
+  });
+  goster("all");
+</script>
